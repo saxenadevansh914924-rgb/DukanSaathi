@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f6fa" />
+    <title>DukanSaathi— Local Shop Inventory</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="taskbar">
+      <a class="brand" href="#overview" aria-label="DukanSaathi overview">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3.5 10 12 3.5 20.5 10v10a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V10Z"
+            />
+            <path d="M9 20.5v-6h6v6M3.5 10h17" />
+          </svg>
+        </span>
+        <span class="brand-name">DukanSaathi<span>.</span></span>
+      </a>
+      <div class="taskbar-actions">
+        <div class="shop-status hidden" id="shop-status">
+          <span class="status-dot"></span
+          ><span id="shop-name-label">Meri Dukaan</span>
+        </div>
+        <div class="date-chip" id="date-chip">
+          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="4.5" width="14" height="12" rx="2" />
+            <path d="M6.5 3v3M13.5 3v3M3 8h14" />
+          </svg>
+          <time id="today-label"></time>
+        </div>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          aria-pressed="false"
+          title="Switch to dark mode"
+        >
+          <span id="theme-toggle-icon" aria-hidden="true">◐</span>
+        </button>
+        <button class="add-button hidden" id="add-product-link" type="button">
+          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+            <path d="M10 4v12M4 10h12" /></svg
+          ><span>Add product</span>
+        </button>
+        <div class="auth-actions" id="auth-actions">
+          <button class="text-button" id="show-login" type="button">
+            Log in
+          </button>
+          <button class="add-button" id="show-signup" type="button">
+            Create owner account
+          </button>
+        </div>
+        <button
+          class="sidebar-toggle hidden"
+          id="sidebar-toggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="app-sidebar"
+        >
+          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+            <path d="M3 5h14M3 10h14M3 15h14" />
+          </svg>
+        </button>
+        <button class="logout-button hidden" id="logout-button" type="button">
+          Log out
+        </button>
+      </div>
+    </header>
+
+    <main class="auth-layout" id="auth-view">
+      <section class="auth-intro" aria-labelledby="intro-title">
+        <span class="intro-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M4 12 7 5h18l3 7" />
+            <path
+              d="M4 12c0 2 1.8 3.5 4 3.5s4-1.5 4-3.5c0 2 1.8 3.5 4 3.5s4-1.5 4-3.5c0 2 1.8 3.5 4 3.5s4-1.5 4-3.5"
+            />
+            <path d="M6 15.5V27h20V15.5M13 27v-7h6v7" />
+          </svg>
+        </span>
+        <p class="eyebrow">MADE FOR YOUR SHOP</p>
+        <h1 id="intro-title">Your stock,<br />all in one place.</h1>
+        <p class="intro-copy">
+          Sign in to keep your shelves organized and stay on top of expiry
+          dates.
+        </p>
+        <div class="intro-note">
+          <span class="note-check" aria-hidden="true">✓</span
+          ><span>Owner access, powered by Supabase</span>
+        </div>
+      </section>
+
+      <section class="auth-card" aria-labelledby="auth-title">
+        <div class="auth-card-heading">
+          <p class="eyebrow" id="auth-eyebrow">WELCOME BACK</p>
+          <h2 id="auth-title">Log in to Stockroom</h2>
+          <p class="auth-subtitle" id="auth-subtitle">
+            Use your shop owner account to continue.
+          </p>
+        </div>
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button
+            class="auth-tab active"
+            id="login-tab"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="login-panel"
+          >
+            Log in
+          </button>
+          <button
+            class="auth-tab"
+            id="signup-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="signup-panel"
+          >
+            Owner sign up
+          </button>
+        </div>
+        <div
+          class="auth-panel"
+          id="login-panel"
+          role="tabpanel"
+          aria-labelledby="login-tab"
+        >
+          <form id="login-form" novalidate>
+            <div class="form-field">
+              <label for="login-email">Email address</label
+              ><input
+                id="login-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@yourshop.com"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label for="login-password">Password</label>
+              <div class="password-input">
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Enter your password"
+                  required
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  aria-controls="login-password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <button class="submit-button" type="submit">
+              <span>Log in</span
+              ><svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10h12m-5-5 5 5-5 5" />
+              </svg>
+            </button>
+          </form>
+        </div>
+        <div
+          class="auth-panel hidden"
+          id="signup-panel"
+          role="tabpanel"
+          aria-labelledby="signup-tab"
+        >
+          <form id="signup-form" novalidate>
+            <div class="form-field">
+              <label for="signup-shop-name">Shop name</label
+              ><input
+                id="signup-shop-name"
+                name="shopName"
+                type="text"
+                autocomplete="organization"
+                maxlength="80"
+                placeholder="e.g. Sharma General Store"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label for="signup-email">Owner email address</label
+              ><input
+                id="signup-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@yourshop.com"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label for="signup-password">Password</label>
+              <div class="password-input">
+                <input
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  placeholder="At least 8 characters"
+                  required
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  aria-controls="signup-password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="signup-confirm-password">Confirm password</label>
+              <div class="password-input">
+                <input
+                  id="signup-confirm-password"
+                  name="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  placeholder="Enter your password again"
+                  required
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  aria-controls="signup-confirm-password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <button class="submit-button" type="submit">
+              <span>Create owner account</span
+              ><svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10h12m-5-5 5 5-5 5" />
+              </svg>
+            </button>
+          </form>
+        </div>
+        <p
+          class="auth-message"
+          id="auth-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <p class="auth-footnote">
+          Your account is managed securely by Supabase.
+        </p>
+      </section>
+    </main>
+
+    <div class="app-workspace hidden" id="app-view">
+      <div class="sidebar-scrim hidden" id="sidebar-scrim"></div>
+      <aside class="sidebar" id="app-sidebar">
+        <p class="sidebar-label">WORKSPACE</p>
+        <nav class="sidebar-nav" aria-label="Shop navigation">
+          <button
+            class="side-link active"
+            type="button"
+            data-view="dashboard"
+            aria-current="page"
+          >
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="3" width="5.5" height="5.5" rx="1" />
+              <rect x="11.5" y="3" width="5.5" height="5.5" rx="1" />
+              <rect x="3" y="11.5" width="5.5" height="5.5" rx="1" />
+              <rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1" /></svg
+            ><span>Dashboard</span>
+          </button>
+          <button class="side-link" type="button" data-view="products">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="m10 2.5 7 4v7l-7 4-7-4v-7l7-4Z" />
+              <path d="m3.5 6.8 6.5 3.7 6.5-3.7M10 10.5v7" /></svg
+            ><span>Products</span>
+          </button>
+          <button class="side-link" type="button" data-view="alerts">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5 2.5 16h15L10 2.5Z" />
+              <path d="M10 7v4M10 14h.01" /></svg
+            ><span>Alerts</span
+            ><span class="side-count hidden" id="sidebar-alert-count">0</span>
+          </button>
+          <button class="side-link" type="button" data-view="settings">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="3" />
+              <path
+                d="m16.1 11.6 1.2.9-1.2 2.1-1.5-.5a6.7 6.7 0 0 1-1.4.8l-.3 1.6h-2.4l-.3-1.6a6.7 6.7 0 0 1-1.4-.8l-1.5.5-1.2-2.1 1.2-.9a6 6 0 0 1 0-1.6l-1.2-.9 1.2-2.1 1.5.5a6.7 6.7 0 0 1 1.4-.8l.3-1.6h2.4l.3 1.6a6.7 6.7 0 0 1 1.4.8l1.5-.5 1.2 2.1-1.2.9a6 6 0 0 1 0 1.6Z"
+              /></svg
+            ><span>Settings</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-search-row">
+          <label class="global-search hidden" id="global-search"
+            ><svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.8" cy="8.8" r="5.8" />
+              <path d="m13.2 13.2 4 4" /></svg
+            ><span class="visually-hidden">Search products</span
+            ><input
+              id="product-search"
+              type="search"
+              placeholder="Search by product name or unit..."
+              autocomplete="off"
+          /></label>
+        </div>
+
+        <section
+          class="app-page"
+          id="dashboard-page"
+          aria-labelledby="dashboard-title"
+        >
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">
+                SHOP OVERVIEW · <span id="dashboard-date"></span>
+              </p>
+              <h1 id="dashboard-title">Good morning</h1>
+              <p class="page-subtitle">Here’s your shop’s stock overview.</p>
+            </div>
+          </div>
+          <div
+            class="dashboard-tabs"
+            role="tablist"
+            aria-label="Dashboard sections"
+          >
+            <button
+              class="dashboard-tab active"
+              id="inventory-tab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="inventory-dashboard-panel"
+              data-dashboard-tab="inventory"
+            >
+              Inventory &amp; Expiry
+            </button>
+            <button
+              class="dashboard-tab"
+              id="khata-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="khata-panel"
+              data-dashboard-tab="khata"
+            >
+              Small Credit Ledger
+            </button>
+          </div>
+          <div
+            id="inventory-dashboard-panel"
+            role="tabpanel"
+            aria-labelledby="inventory-tab"
+          >
+            <section class="summary-grid" aria-label="Stock summary">
+              <button
+                class="summary-card total-card"
+                type="button"
+                data-summary-filter="all"
+              >
+                <span class="summary-top"
+                  ><span class="summary-label">Total products</span
+                  ><span class="summary-icon">▦</span></span
+                ><strong class="summary-value" id="total-products">0</strong
+                ><span class="summary-foot">Items in your shop</span>
+              </button>
+              <button
+                class="summary-card low-card"
+                type="button"
+                data-summary-filter="low"
+              >
+                <span class="summary-top"
+                  ><span class="summary-label">Low stock</span
+                  ><span class="summary-icon">↓</span></span
+                ><strong class="summary-value" id="low-stock-count">0</strong
+                ><span class="summary-foot">Need a restock soon</span>
+              </button>
+              <button
+                class="summary-card soon-card"
+                type="button"
+                data-summary-filter="soon"
+              >
+                <span class="summary-top"
+                  ><span class="summary-label">Expiry soon</span
+                  ><span class="summary-icon">◷</span></span
+                ><strong class="summary-value" id="expiry-soon-count">0</strong
+                ><span class="summary-foot" id="expiry-summary-foot"
+                  >Within the next 7 days</span
+                >
+              </button>
+              <button
+                class="summary-card expired-card"
+                type="button"
+                data-summary-filter="expired"
+              >
+                <span class="summary-top"
+                  ><span class="summary-label">Expired</span
+                  ><span class="summary-icon">!</span></span
+                ><strong class="summary-value" id="expired-count">0</strong
+                ><span class="summary-foot">Need your attention</span>
+              </button>
+            </section>
+            <div class="dashboard-grid">
+              <section
+                class="content-card alerts-card"
+                aria-labelledby="alerts-title"
+              >
+                <div class="section-heading">
+                  <div>
+                    <p class="eyebrow">NEEDS ATTENTION</p>
+                    <h2 id="alerts-title">Stock alerts</h2>
+                  </div>
+                  <button class="text-link" type="button" data-view="alerts">
+                    View all alerts <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+                <div class="alerts-list" id="dashboard-alert-list"></div>
+              </section>
+              <section
+                class="content-card recent-card"
+                aria-labelledby="recent-title"
+              >
+                <div class="section-heading">
+                  <div>
+                    <p class="eyebrow">LATEST UPDATES</p>
+                    <h2 id="recent-title">Recent products</h2>
+                  </div>
+                  <button class="text-link" type="button" data-view="products">
+                    View products <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+                <div
+                  class="filter-row"
+                  role="group"
+                  aria-label="Filter recent products"
+                >
+                  <button
+                    class="filter-chip active"
+                    type="button"
+                    data-inventory-filter="all"
+                    aria-pressed="true"
+                  >
+                    All</button
+                  ><button
+                    class="filter-chip"
+                    type="button"
+                    data-inventory-filter="low"
+                    aria-pressed="false"
+                  >
+                    Low Stock</button
+                  ><button
+                    class="filter-chip"
+                    type="button"
+                    data-inventory-filter="soon"
+                    aria-pressed="false"
+                  >
+                    Expiring Soon</button
+                  ><button
+                    class="filter-chip"
+                    type="button"
+                    data-inventory-filter="expired"
+                    aria-pressed="false"
+                  >
+                    Expired
+                  </button>
+                </div>
+                <div class="table-wrap" id="dashboard-table-wrap">
+                  <table class="products-table">
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Expiry date</th>
+                        <th>Status</th>
+                        <th><span class="visually-hidden">Actions</span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboard-products-table"></tbody>
+                  </table>
+                </div>
+                <div class="empty-state hidden" id="dashboard-empty-state">
+                  <span class="empty-icon" aria-hidden="true">▦</span>
+                  <h3>No products yet</h3>
+                  <p>
+                    Add your first product to start keeping track of your stock.
+                  </p>
+                  <button
+                    class="empty-add-button"
+                    type="button"
+                    data-add-product
+                  >
+                    Add your first product
+                  </button>
+                </div>
+              </section>
+            </div>
+          </div>
+          <section
+            class="khata-panel hidden"
+            id="khata-panel"
+            role="tabpanel"
+            aria-labelledby="khata-tab"
+          >
+            <div class="khata-overview">
+              <div>
+                <p class="eyebrow">REGULAR CUSTOMERS</p>
+                <h2>Chhota udhaar, saaf hisaab</h2>
+                <p class="page-subtitle">
+                  Customer ka baki balance dekhein, udhaar jodein, ya payment
+                  chukta mark karein. WhatsApp reminder bhejne se pehle khulega,
+                  aap message review karke send karenge.
+                </p>
+              </div>
+              <div class="khata-total-card">
+                <span>Total baki udhaar</span
+                ><strong id="khata-total-balance">₹0.00</strong
+                ><small id="khata-customer-count">0 customers</small>
+              </div>
+            </div>
+            <div class="khata-grid">
+              <section
+                class="content-card khata-form-card"
+                aria-labelledby="customer-form-title"
+              >
+                <div class="section-heading">
+                  <div>
+                    <p class="eyebrow">CUSTOMER DETAILS</p>
+                    <h2 id="customer-form-title">Add regular customer</h2>
+                  </div>
+                </div>
+                <form id="customer-form" novalidate>
+                  <input id="customer-id" type="hidden" />
+                  <div class="form-field">
+                    <label for="customer-name">Customer name</label
+                    ><input
+                      id="customer-name"
+                      type="text"
+                      maxlength="80"
+                      placeholder="e.g. Ramesh Kumar"
+                      required
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="customer-phone">WhatsApp phone number</label
+                    ><input
+                      id="customer-phone"
+                      type="tel"
+                      inputmode="tel"
+                      maxlength="24"
+                      placeholder="98765 43210"
+                      aria-describedby="customer-phone-help"
+                      required
+                    />
+                    <p class="settings-field-help" id="customer-phone-help">
+                      Indian 10-digit numbers are accepted; international
+                      numbers should include country code.
+                    </p>
+                  </div>
+                  <div class="form-field" id="opening-balance-field">
+                    <label for="customer-opening-balance"
+                      >Starting udhaar (₹)</label
+                    ><input
+                      id="customer-opening-balance"
+                      type="number"
+                      min="0"
+                      max="9999999999.99"
+                      step="0.01"
+                      value="0"
+                    />
+                  </div>
+                  <p
+                    class="form-feedback"
+                    id="customer-form-feedback"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                  <button
+                    class="submit-button"
+                    id="save-customer-button"
+                    type="submit"
+                  >
+                    <span>Add customer</span>
+                  </button>
+                  <button
+                    class="cancel-button hidden"
+                    id="cancel-customer-edit"
+                    type="button"
+                  >
+                    Cancel edit
+                  </button>
+                </form>
+              </section>
+              <section
+                class="content-card khata-customers-card"
+                aria-labelledby="customers-title"
+              >
+                <div class="section-heading">
+                  <div>
+                    <p class="eyebrow">UDHAAR REGISTER</p>
+                    <h2 id="customers-title">Customer khata</h2>
+                  </div>
+                  <label class="khata-search"
+                    ><span class="visually-hidden">Search customers</span
+                    ><input
+                      id="customer-search"
+                      type="search"
+                      placeholder="Search customers"
+                      autocomplete="off"
+                  /></label>
+                </div>
+                <div class="customer-list" id="customer-list"></div>
+                <div class="empty-state hidden" id="customer-empty-state">
+                  <span class="empty-icon" aria-hidden="true">₹</span>
+                  <h3 id="customer-empty-title">No customers yet</h3>
+                  <p id="customer-empty-copy">
+                    Add a regular customer to start tracking udhaar.
+                  </p>
+                  <button
+                    class="empty-add-button"
+                    id="empty-add-customer"
+                    type="button"
+                  >
+                    Add first customer
+                  </button>
+                </div>
+              </section>
+            </div>
+            <p
+              class="khata-feedback"
+              id="khata-feedback"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </section>
+        </section>
+
+        <section
+          class="app-page hidden"
+          id="products-page"
+          aria-labelledby="products-title"
+        >
+          <div class="page-heading compact-heading">
+            <div>
+              <p class="eyebrow">YOUR SHOP</p>
+              <h1 id="products-title">Products</h1>
+              <p class="page-subtitle">
+                Manage quantities and keep an eye on expiry dates.
+              </p>
+            </div>
+          </div>
+          <section class="content-card full-products-card">
+            <div class="section-heading products-section-heading">
+              <div>
+                <p class="eyebrow">INVENTORY</p>
+                <div class="products-heading-line">
+                  <h2>All products</h2>
+                  <div class="inventory-import-actions">
+                    <button
+                      class="secondary-button"
+                      id="open-json-import"
+                      type="button"
+                    >
+                      Update from JSON</button
+                    ><button
+                      class="secondary-button"
+                      id="open-manual-list"
+                      type="button"
+                    >
+                      Add stock list
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <span class="list-count" id="products-list-count"
+                >0 products</span
+              >
+            </div>
+            <div class="filter-row" role="group" aria-label="Filter products">
+              <button
+                class="filter-chip active"
+                type="button"
+                data-inventory-filter="all"
+                aria-pressed="true"
+              >
+                All</button
+              ><button
+                class="filter-chip"
+                type="button"
+                data-inventory-filter="low"
+                aria-pressed="false"
+              >
+                Low Stock</button
+              ><button
+                class="filter-chip"
+                type="button"
+                data-inventory-filter="soon"
+                aria-pressed="false"
+              >
+                Expiring Soon</button
+              ><button
+                class="filter-chip"
+                type="button"
+                data-inventory-filter="expired"
+                aria-pressed="false"
+              >
+                Expired
+              </button>
+            </div>
+            <div class="table-wrap" id="products-table-wrap">
+              <table class="products-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Expiry date</th>
+                    <th>Status</th>
+                    <th><span class="visually-hidden">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="products-table"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="products-empty-state">
+              <span class="empty-icon" aria-hidden="true">▦</span>
+              <h3 id="products-empty-title">No products yet</h3>
+              <p id="products-empty-copy">
+                Add your first product to start keeping track of your stock.
+              </p>
+              <button class="empty-add-button" type="button" data-add-product>
+                Add your first product
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section
+          class="app-page hidden"
+          id="alerts-page"
+          aria-labelledby="all-alerts-title"
+        >
+          <div class="page-heading compact-heading">
+            <div>
+              <p class="eyebrow">STOCK CHECK</p>
+              <h1 id="all-alerts-title">Alerts</h1>
+              <p class="page-subtitle">
+                Low stock and expiry dates that need your attention.
+              </p>
+            </div>
+          </div>
+          <section class="content-card">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">ACTION REQUIRED</p>
+                <h2>All alerts</h2>
+              </div>
+            </div>
+            <div
+              class="alerts-list full-alerts-list"
+              id="all-alerts-list"
+            ></div>
+          </section>
+        </section>
+
+        <section
+          class="app-page hidden"
+          id="settings-page"
+          aria-labelledby="settings-title"
+        >
+          <div class="page-heading compact-heading">
+            <div>
+              <p class="eyebrow">PREFERENCES</p>
+              <h1 id="settings-title">Settings</h1>
+              <p class="page-subtitle">
+                Choose how your shop inventory and alerts work.
+              </p>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <section class="content-card settings-panel">
+              <div class="settings-panel-heading">
+                <span class="settings-panel-icon" aria-hidden="true">⌂</span>
+                <div>
+                  <p class="eyebrow">YOUR BUSINESS</p>
+                  <h2>Shop details</h2>
+                </div>
+              </div>
+              <form class="settings-form" id="shop-details-form" novalidate>
+                <div class="form-field">
+                  <label for="settings-shop-name-input">Shop name</label
+                  ><input
+                    id="settings-shop-name-input"
+                    type="text"
+                    maxlength="80"
+                    required
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="settings-currency">Currency</label
+                  ><input
+                    id="settings-currency"
+                    type="text"
+                    value="₹ INR — Indian Rupee"
+                    readonly
+                  />
+                  <p class="settings-field-help">
+                    Only Indian rupees are supported.
+                  </p>
+                </div>
+                <div class="settings-form-actions">
+                  <button class="submit-button" type="submit">
+                    Save shop details
+                  </button>
+                  <p
+                    class="settings-feedback"
+                    id="shop-details-feedback"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </form>
+            </section>
+            <section class="content-card settings-panel">
+              <div class="settings-panel-heading">
+                <span class="settings-panel-icon warning" aria-hidden="true"
+                  >↓</span
+                >
+                <div>
+                  <p class="eyebrow">INVENTORY</p>
+                  <h2>Stock alerts</h2>
+                </div>
+              </div>
+              <form class="settings-form" id="stock-alerts-form" novalidate>
+                <div class="form-field">
+                  <label for="default-low-stock-threshold"
+                    >Default low-stock threshold</label
+                  ><input
+                    id="default-low-stock-threshold"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                  <p class="settings-field-help">
+                    Products use their own threshold when set; otherwise this
+                    default applies.
+                  </p>
+                </div>
+                <div class="settings-form-actions">
+                  <button class="submit-button" type="submit">
+                    Save stock alerts
+                  </button>
+                  <p
+                    class="settings-feedback"
+                    id="stock-alerts-feedback"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </form>
+            </section>
+            <section class="content-card settings-panel">
+              <div class="settings-panel-heading">
+                <span class="settings-panel-icon expiry" aria-hidden="true"
+                  >◷</span
+                >
+                <div>
+                  <p class="eyebrow">PRODUCT DATES</p>
+                  <h2>Expiry reminders</h2>
+                </div>
+              </div>
+              <form class="settings-form" id="expiry-reminders-form" novalidate>
+                <fieldset class="expiry-options">
+                  <legend>Warn before expiry</legend>
+                  <label
+                    ><input
+                      name="expiryWarningDays"
+                      type="radio"
+                      value="3"
+                      required
+                    /><span>3 days</span></label
+                  ><label
+                    ><input
+                      name="expiryWarningDays"
+                      type="radio"
+                      value="7"
+                    /><span>7 days</span></label
+                  ><label
+                    ><input
+                      name="expiryWarningDays"
+                      type="radio"
+                      value="14"
+                    /><span>14 days</span></label
+                  >
+                </fieldset>
+                <div class="settings-form-actions">
+                  <button class="submit-button" type="submit">
+                    Save expiry reminders
+                  </button>
+                  <p
+                    class="settings-feedback"
+                    id="expiry-reminders-feedback"
+                    role="status"
+                    aria-live="polite"
+                  ></p>
+                </div>
+              </form>
+            </section>
+            <section class="content-card settings-panel">
+              <div class="settings-panel-heading">
+                <span class="settings-panel-icon data" aria-hidden="true"
+                  >▦</span
+                >
+                <div>
+                  <p class="eyebrow">INVENTORY DATA</p>
+                  <h2>Data management</h2>
+                </div>
+              </div>
+              <p class="settings-field-help data-management-copy">
+                Products, shop settings, and customer khata are stored in
+                Supabase for this account.
+              </p>
+              <div class="data-management-actions">
+                <button
+                  class="secondary-button"
+                  id="restore-samples-button"
+                  type="button"
+                >
+                  Restore sample data</button
+                ><button
+                  class="danger-button"
+                  id="clear-data-button"
+                  type="button"
+                >
+                  Clear all products
+                </button>
+              </div>
+              <p
+                class="settings-feedback"
+                id="data-management-feedback"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </section>
+            <section class="content-card settings-panel account-settings-panel">
+              <p class="eyebrow">OWNER ACCOUNT</p>
+              <h2>Account details</h2>
+              <p class="account-shop-name" id="settings-shop-name">
+                Meri Dukaan
+              </p>
+              <p id="owner-email" class="owner-email"></p>
+            </section>
+          </div>
+        </section>
+        <p
+          class="auth-message app-message"
+          id="app-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+      </main>
+    </div>
+
+    <dialog
+      class="product-dialog"
+      id="product-dialog"
+      aria-labelledby="product-dialog-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">INVENTORY ITEM</p>
+          <h2 id="product-dialog-title">Add a product</h2>
+        </div>
+        <button
+          class="dialog-close"
+          id="cancel-product"
+          type="button"
+          aria-label="Close product form"
+        >
+          ×
+        </button>
+      </div>
+      <form id="product-form" novalidate>
+        <input id="product-id" type="hidden" />
+        <div class="form-field">
+          <label for="product-name">Product name</label
+          ><input
+            id="product-name"
+            type="text"
+            maxlength="80"
+            placeholder="e.g. Basmati rice"
+            required
+          />
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="product-quantity">Quantity</label
+            ><input
+              id="product-quantity"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0"
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label for="product-unit">Unit</label
+            ><input
+              id="product-unit"
+              type="text"
+              maxlength="20"
+              placeholder="kg, pcs"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="product-expiry">Expiry date</label
+          ><input id="product-expiry" type="date" required />
+        </div>
+        <div class="form-field">
+          <label for="product-threshold"
+            >Low-stock threshold
+            <span class="optional-label">Optional</span></label
+          ><input
+            id="product-threshold"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Use shop default"
+          />
+        </div>
+        <p
+          class="product-form-error"
+          id="product-form-error"
+          role="alert"
+          aria-live="polite"
+        ></p>
+        <div class="dialog-actions">
+          <button
+            class="cancel-button"
+            id="cancel-product-action"
+            type="button"
+          >
+            Cancel</button
+          ><button class="submit-button" id="save-product-button" type="submit">
+            <span>Add product</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="product-dialog data-confirm-dialog"
+      id="data-action-dialog"
+      aria-labelledby="data-action-title"
+      aria-describedby="data-action-description"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">DATA MANAGEMENT</p>
+          <h2 id="data-action-title">Confirm action</h2>
+        </div>
+        <button
+          class="dialog-close"
+          id="close-data-action"
+          type="button"
+          aria-label="Close confirmation"
+        >
+          ×
+        </button>
+      </div>
+      <p class="data-action-description" id="data-action-description"></p>
+      <div class="dialog-actions">
+        <button class="cancel-button" id="cancel-data-action" type="button">
+          Cancel</button
+        ><button class="danger-button" id="confirm-data-action" type="button">
+          Continue
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="product-dialog khata-transaction-dialog"
+      id="khata-transaction-dialog"
+      aria-labelledby="khata-transaction-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">CUSTOMER KHATA</p>
+          <h2 id="khata-transaction-title">Add udhaar</h2>
+        </div>
+        <button
+          class="dialog-close"
+          id="close-khata-transaction"
+          type="button"
+          aria-label="Close amount form"
+        >
+          ×
+        </button>
+      </div>
+      <form id="khata-transaction-form" novalidate>
+        <p class="transaction-customer-name" id="transaction-customer-name"></p>
+        <div class="form-field">
+          <label id="transaction-amount-label" for="transaction-amount"
+            >Amount (₹)</label
+          ><input
+            id="transaction-amount"
+            type="number"
+            min="0.01"
+            max="9999999999.99"
+            step="0.01"
+            required
+          />
+        </div>
+        <p
+          class="product-form-error"
+          id="transaction-form-error"
+          role="alert"
+          aria-live="polite"
+        ></p>
+        <div class="dialog-actions">
+          <button
+            class="cancel-button"
+            id="cancel-khata-transaction"
+            type="button"
+          >
+            Cancel</button
+          ><button
+            class="submit-button"
+            id="save-khata-transaction"
+            type="submit"
+          >
+            <span>Save amount</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="product-dialog bulk-import-dialog"
+      id="json-import-dialog"
+      aria-labelledby="json-import-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">BULK STOCK UPDATE</p>
+          <h2 id="json-import-title">Update from JSON</h2>
+        </div>
+        <button
+          class="dialog-close"
+          id="close-json-import"
+          type="button"
+          aria-label="Close JSON import"
+        >
+          ×
+        </button>
+      </div>
+      <form id="json-import-form" novalidate>
+        <p class="import-help">
+          Paste a JSON array or choose a .json file. Existing products match by
+          <code>id</code> or product name; omitted fields stay unchanged. New
+          products need name, quantity, unit, and expiry date. This adds/updates
+          only—it will not delete other products.
+        </p>
+        <label class="file-picker" for="stock-json-file"
+          >Choose JSON file<input
+            id="stock-json-file"
+            type="file"
+            accept=".json,application/json"
+        /></label>
+        <div class="form-field">
+          <label for="stock-json-input">JSON data</label
+          ><textarea
+            id="stock-json-input"
+            rows="9"
+            spellcheck="false"
+            placeholder='[{"name":"Atta","quantity":20,"unit":"kg","expiry_date":"2027-01-30","low_stock_threshold":5}]'
+            required
+          ></textarea>
+        </div>
+        <p
+          class="import-feedback"
+          id="json-import-feedback"
+          role="alert"
+          aria-live="polite"
+        ></p>
+        <div class="dialog-actions">
+          <button class="cancel-button" id="cancel-json-import" type="button">
+            Cancel</button
+          ><button class="submit-button" id="submit-json-import" type="submit">
+            <span>Import stock</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="product-dialog bulk-import-dialog"
+      id="manual-list-dialog"
+      aria-labelledby="manual-list-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">BULK STOCK ENTRY</p>
+          <h2 id="manual-list-title">Add stock list manually</h2>
+        </div>
+        <button
+          class="dialog-close"
+          id="close-manual-list"
+          type="button"
+          aria-label="Close manual stock list"
+        >
+          ×
+        </button>
+      </div>
+      <form id="manual-list-form" novalidate>
+        <p class="import-help">
+          One product per line, separated with <code>|</code>:
+          <code
+            >Name | Quantity | Unit | YYYY-MM-DD expiry | threshold
+            (optional)</code
+          >. Existing products can use just <code>Name | Quantity</code>; new
+          products need a unit and expiry date. Blank lines are ignored.
+        </p>
+        <div class="form-field">
+          <label for="manual-stock-input">Stock list</label
+          ><textarea
+            id="manual-stock-input"
+            rows="9"
+            spellcheck="false"
+            placeholder="Atta | 20 | kg | 2027-01-30 | 5&#10;Toor dal | 8 | kg | 2027-03-15"
+            required
+          ></textarea>
+        </div>
+        <p
+          class="import-feedback"
+          id="manual-list-feedback"
+          role="alert"
+          aria-live="polite"
+        ></p>
+        <div class="dialog-actions">
+          <button class="cancel-button" id="cancel-manual-list" type="button">
+            Cancel</button
+          ><button class="submit-button" id="submit-manual-list" type="submit">
+            <span>Save stock list</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
