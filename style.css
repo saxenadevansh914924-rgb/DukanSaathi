@@ -242,6 +242,9 @@ input:focus-visible {
   align-items: center;
   gap: 13px;
 }
+.signup-label-mobile {
+  display: none;
+}
 .sidebar-toggle {
   display: none;
 }
@@ -1665,12 +1668,19 @@ input:focus-visible {
     gap: 8px;
   }
   .auth-actions .text-button {
-    font-size: 12px;
+    display: none;
+  }
+  .signup-label-full {
+    display: none;
+  }
+  .signup-label-mobile {
+    display: inline;
   }
   .auth-actions .add-button {
     min-height: 35px;
-    padding: 0 10px;
-    font-size: 11px;
+    padding: 0 12px;
+    font-size: 12px;
+    white-space: nowrap;
   }
   .auth-layout {
     min-height: calc(100vh - 64px);
@@ -1759,6 +1769,14 @@ input:focus-visible {
     min-height: 36px;
     padding: 0 11px;
     font-size: 11px;
+  }
+  #add-product-link {
+    width: 37px;
+    min-width: 37px;
+    padding: 0;
+  }
+  #add-product-link span {
+    display: none;
   }
   .app-search-row {
     justify-content: stretch;
