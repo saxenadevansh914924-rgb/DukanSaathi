@@ -1,11 +1,15 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
+  owner_name text,
   shop_name text,
   created_at timestamptz not null default now(),
   last_sign_in_at timestamptz,
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists owner_name text;
 
 alter table public.profiles enable row level security;
 
@@ -30,6 +34,7 @@ begin
     insert into public.profiles (
       id,
       email,
+      owner_name,
       shop_name,
       created_at,
       last_sign_in_at
@@ -37,6 +42,7 @@ begin
     values (
       new.id,
       new.email,
+      nullif(new.raw_user_meta_data ->> 'owner_name', ''),
       nullif(new.raw_user_meta_data ->> 'shop_name', ''),
       new.created_at,
       new.last_sign_in_at
@@ -44,6 +50,7 @@ begin
     on conflict (id) do update
     set
       email = excluded.email,
+      owner_name = coalesce(excluded.owner_name, public.profiles.owner_name),
       shop_name = coalesce(excluded.shop_name, public.profiles.shop_name),
       last_sign_in_at = excluded.last_sign_in_at,
       updated_at = now();
@@ -51,6 +58,10 @@ begin
     update public.profiles
     set
       email = new.email,
+      owner_name = coalesce(
+        nullif(new.raw_user_meta_data ->> 'owner_name', ''),
+        owner_name
+      ),
       shop_name = coalesce(
         nullif(new.raw_user_meta_data ->> 'shop_name', ''),
         shop_name
@@ -70,6 +81,15 @@ create trigger sync_auth_user_profile
 after insert or update on auth.users
 for each row
 execute function public.sync_auth_user_profile();
+
+update public.profiles as profile
+set
+  owner_name = nullif(auth_user.raw_user_meta_data ->> 'owner_name', ''),
+  updated_at = now()
+from auth.users as auth_user
+where profile.id = auth_user.id
+  and profile.owner_name is null
+  and nullif(auth_user.raw_user_meta_data ->> 'owner_name', '') is not null;
 
 create table if not exists public.shop_settings (
   owner_id uuid primary key references auth.users(id) on delete cascade,

@@ -122,8 +122,14 @@ const elements = {
   productsListCount: $("#products-list-count"),
   settingsShopNameInput: $("#settings-shop-name-input"),
   defaultLowStockThreshold: $("#default-low-stock-threshold"),
-  settingsShopName: $("#settings-shop-name"),
-  ownerEmail: $("#owner-email"),
+  profileName: $("#profile-name"),
+  profileOwnerNameInput: $("#profile-owner-name"),
+  profileAvatar: $("#profile-avatar"),
+  profileShopNameInput: $("#profile-shop-name"),
+  profileEmailInput: $("#profile-email"),
+  profileForm: $("#profile-form"),
+  profileFeedback: $("#profile-feedback"),
+  saveProfileButton: $("#save-profile-button"),
   shopDetailsFeedback: $("#shop-details-feedback"),
   stockAlertsFeedback: $("#stock-alerts-feedback"),
   expiryRemindersFeedback: $("#expiry-reminders-feedback"),
@@ -794,12 +800,32 @@ function renderApp() {
   elements.expiredCount.textContent = String(expiredCount);
   elements.expirySummaryFoot.textContent = `Within the next ${state.settings.expiry_warning_days} days`;
   elements.shopNameLabel.textContent = state.settings.shop_name;
-  elements.settingsShopName.textContent = state.settings.shop_name;
   elements.settingsShopNameInput.value = state.settings.shop_name;
   elements.defaultLowStockThreshold.value = String(
     state.settings.default_low_stock_threshold,
   );
-  elements.ownerEmail.textContent = state.session?.user?.email || "";
+  const userMetadata = state.session?.user?.user_metadata;
+  const ownerName = [
+    userMetadata?.owner_name,
+    userMetadata?.full_name,
+    userMetadata?.name,
+  ].find((name) => typeof name === "string" && name.trim())?.trim()
+    || "Name not provided";
+  elements.profileName.textContent = ownerName;
+  elements.profileOwnerNameInput.value =
+    ownerName === "Name not provided" ? "" : ownerName;
+  elements.profileAvatar.textContent =
+    ownerName === "Name not provided"
+      ? "?"
+      : ownerName
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part[0])
+          .join("")
+          .toUpperCase();
+  elements.profileEmailInput.value =
+    state.session?.user?.new_email || state.session?.user?.email || "";
+  elements.profileShopNameInput.value = state.settings.shop_name;
   elements.dashboardTitle.textContent = getGreeting();
   elements.todayLabel.textContent = formatToday();
   elements.dashboardDate.textContent = formatToday();
@@ -840,6 +866,7 @@ function renderApp() {
     dashboard: "dashboard-page",
     products: "products-page",
     alerts: "alerts-page",
+    profile: "profile-page",
     settings: "settings-page",
   })) {
     $(`#${pageId}`).classList.toggle("hidden", state.view !== view);
@@ -857,7 +884,10 @@ function renderApp() {
 }
 
 function setView(view) {
-  if (!["dashboard", "products", "alerts", "settings"].includes(view)) return;
+  if (
+    !["dashboard", "products", "alerts", "profile", "settings"].includes(view)
+  )
+    return;
   state.view = view;
   elements.appView.classList.remove("sidebar-open");
   elements.sidebarToggle.setAttribute("aria-expanded", "false");
@@ -1167,10 +1197,14 @@ async function handleSignup(event) {
   const button = $("button[type='submit']", elements.signupForm);
   setButtonBusy(button, true, "Creating account…");
   const shopName = $("#signup-shop-name").value.trim();
+  const ownerName = $("#signup-owner-name").value.trim();
   const email = $("#signup-email").value.trim();
   const password = $("#signup-password").value;
   const confirmPassword = $("#signup-confirm-password").value;
   try {
+    if (!ownerName) throw new Error("Enter the owner's name.");
+    if (ownerName.length > 80)
+      throw new Error("Owner name must be 80 characters or fewer.");
     if (!shopName) throw new Error("Enter your shop name.");
     if (shopName.length > 80)
       throw new Error("Shop name must be 80 characters or fewer.");
@@ -1182,7 +1216,7 @@ async function handleSignup(event) {
     const result = await authenticate("/auth/v1/signup", {
       email,
       password,
-      data: { shop_name: shopName },
+      data: { owner_name: ownerName, shop_name: shopName },
     });
     if (!result.signedIn) {
       setMessage(
@@ -1977,7 +2011,12 @@ async function saveShopDetails(event) {
     try {
       const updatedUser = await supabaseRequest("/auth/v1/user", {
         method: "PUT",
-        body: JSON.stringify({ data: { shop_name: shopName } }),
+        body: JSON.stringify({
+          data: {
+            ...state.session.user.user_metadata,
+            shop_name: shopName,
+          },
+        }),
       });
       if (updatedUser?.id === state.session.user.id) {
         state.session = { ...state.session, user: updatedUser };
@@ -1998,6 +2037,124 @@ async function saveShopDetails(event) {
       `Could not save shop details: ${error.message}`,
       "error",
     );
+  }
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+  setMessage(elements.profileFeedback, "");
+  const ownerName = elements.profileOwnerNameInput.value.trim();
+  const shopName = elements.profileShopNameInput.value.trim();
+  const email = elements.profileEmailInput.value.trim();
+  const user = state.session?.user;
+
+  if (!user?.id) {
+    setMessage(
+      elements.profileFeedback,
+      "Your session has expired. Log in again to update your profile.",
+      "error",
+    );
+    return;
+  }
+  if (!ownerName || ownerName.length > 80) {
+    setMessage(
+      elements.profileFeedback,
+      "Enter an owner name between 1 and 80 characters.",
+      "error",
+    );
+    return;
+  }
+  if (!shopName || shopName.length > 80) {
+    setMessage(
+      elements.profileFeedback,
+      "Enter a shop name between 1 and 80 characters.",
+      "error",
+    );
+    return;
+  }
+  if (
+    !email ||
+    email.length > 254 ||
+    !elements.profileEmailInput.validity.valid
+  ) {
+    setMessage(
+      elements.profileFeedback,
+      "Enter a valid email address.",
+      "error",
+    );
+    return;
+  }
+
+  const currentOwnerName =
+    user.user_metadata?.owner_name ||
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    "";
+  const shopChanged = shopName !== state.settings.shop_name;
+  const ownerChanged = ownerName !== currentOwnerName;
+  const emailChanged = email.toLowerCase() !== (user.email || "").toLowerCase();
+  if (!shopChanged && !ownerChanged && !emailChanged) {
+    setMessage(elements.profileFeedback, "No changes to save.", "success");
+    return;
+  }
+
+  setButtonBusy(elements.saveProfileButton, true, "Saving…");
+  let shopSaved = false;
+  try {
+    if (shopChanged) {
+      await patchShopSettings(user.id, { shop_name: shopName });
+      state.settings.shop_name = shopName;
+      shopSaved = true;
+    }
+
+    const updatedUser = await supabaseRequest("/auth/v1/user", {
+      method: "PUT",
+      body: JSON.stringify({
+        ...(emailChanged ? { email } : {}),
+        data: {
+          ...user.user_metadata,
+          owner_name: ownerName,
+          shop_name: shopName,
+        },
+      }),
+    });
+    if (updatedUser?.id !== user.id) {
+      throw new Error("Supabase returned unexpected account details.");
+    }
+    state.session = { ...state.session, user: updatedUser };
+    saveSession(state.session);
+    renderApp();
+
+    if (
+      emailChanged &&
+      String(updatedUser.email || "").toLowerCase() !== email.toLowerCase()
+    ) {
+      elements.profileEmailInput.value = updatedUser.new_email || email;
+      setMessage(
+        elements.profileFeedback,
+        `Profile saved. Confirm the email change using the link sent to ${email}. Your current email stays active until then.`,
+        "success",
+      );
+    } else {
+      setMessage(elements.profileFeedback, "Profile updated.", "success");
+    }
+  } catch (error) {
+    if (shopSaved) {
+      renderApp();
+      setMessage(
+        elements.profileFeedback,
+        `Shop name saved, but the account profile could not be updated: ${error.message}`,
+        "error",
+      );
+    } else {
+      setMessage(
+        elements.profileFeedback,
+        `Could not update your profile: ${error.message}`,
+        "error",
+      );
+    }
+  } finally {
+    setButtonBusy(elements.saveProfileButton, false);
   }
 }
 
@@ -2087,7 +2244,7 @@ function bindEvents() {
   });
   $("#show-signup").addEventListener("click", () => {
     switchAuthTab("signup");
-    $("#signup-shop-name").focus();
+    $("#signup-owner-name").focus();
   });
   $$(".password-toggle").forEach((button) =>
     button.addEventListener("click", () => {
@@ -2231,6 +2388,7 @@ function bindEvents() {
   });
   elements.dashboardTable.addEventListener("click", handleTableAction);
   elements.productsTable.addEventListener("click", handleTableAction);
+  elements.profileForm.addEventListener("submit", saveProfile);
   $("#shop-details-form").addEventListener("submit", saveShopDetails);
   $("#stock-alerts-form").addEventListener("submit", saveStockAlerts);
   $("#expiry-reminders-form").addEventListener("submit", saveExpiryReminders);

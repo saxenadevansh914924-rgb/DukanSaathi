@@ -188,6 +188,18 @@
         >
           <form id="signup-form" novalidate>
             <div class="form-field">
+              <label for="signup-owner-name">Owner name</label
+              ><input
+                id="signup-owner-name"
+                name="ownerName"
+                type="text"
+                autocomplete="name"
+                maxlength="80"
+                placeholder="e.g. Ramesh Kumar"
+                required
+              />
+            </div>
+            <div class="form-field">
               <label for="signup-shop-name">Shop name</label
               ><input
                 id="signup-shop-name"
@@ -304,6 +316,13 @@
               <path d="M10 7v4M10 14h.01" /></svg
             ><span>Alerts</span
             ><span class="side-count hidden" id="sidebar-alert-count">0</span>
+          </button>
+          <button class="side-link" type="button" data-view="profile">
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="6.5" r="3" />
+              <path d="M3.5 17c0-3.1 2.7-5.3 6.5-5.3s6.5 2.2 6.5 5.3" />
+            </svg>
+            <span>Profile</span>
           </button>
           <button class="side-link" type="button" data-view="settings">
             <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
@@ -789,6 +808,87 @@
 
         <section
           class="app-page hidden"
+          id="profile-page"
+          aria-labelledby="profile-title"
+        >
+          <div class="page-heading compact-heading">
+            <div>
+              <p class="eyebrow">OWNER ACCOUNT</p>
+              <h1 id="profile-title">Profile</h1>
+              <p class="page-subtitle">
+                Update your account and shop information.
+              </p>
+            </div>
+          </div>
+          <section
+            class="content-card profile-card"
+            aria-labelledby="profile-name"
+          >
+            <div class="profile-overview">
+              <span class="profile-avatar" id="profile-avatar" aria-hidden="true"
+                >?</span
+              >
+              <div>
+                <p class="eyebrow">SHOP OWNER</p>
+                <h2 id="profile-name">Name not provided</h2>
+                <p class="profile-caption">Owner account</p>
+              </div>
+            </div>
+            <form class="profile-form" id="profile-form" novalidate>
+              <div class="form-field">
+                <label for="profile-owner-name">Owner name</label>
+                <input
+                  id="profile-owner-name"
+                  type="text"
+                  autocomplete="name"
+                  maxlength="80"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label for="profile-shop-name">Shop name</label>
+                <input
+                  id="profile-shop-name"
+                  type="text"
+                  autocomplete="organization"
+                  maxlength="80"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label for="profile-email">Email address</label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="254"
+                  required
+                />
+                <p class="settings-field-help">
+                  Email changes may need confirmation before they take effect.
+                </p>
+              </div>
+              <div class="profile-form-actions">
+                <button
+                  class="submit-button"
+                  id="save-profile-button"
+                  type="submit"
+                >
+                  <span>Save profile</span>
+                </button>
+                <p
+                  class="profile-feedback"
+                  id="profile-feedback"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+              </div>
+            </form>
+          </section>
+        </section>
+
+        <section
+          class="app-page hidden"
           id="settings-page"
           aria-labelledby="settings-title"
         >
@@ -966,14 +1066,6 @@
                 role="status"
                 aria-live="polite"
               ></p>
-            </section>
-            <section class="content-card settings-panel account-settings-panel">
-              <p class="eyebrow">OWNER ACCOUNT</p>
-              <h2>Account details</h2>
-              <p class="account-shop-name" id="settings-shop-name">
-                Meri Dukaan
-              </p>
-              <p id="owner-email" class="owner-email"></p>
             </section>
           </div>
         </section>
